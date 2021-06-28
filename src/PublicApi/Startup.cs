@@ -66,11 +66,11 @@ namespace Microsoft.eShopWeb.PublicApi
             // Requires LocalDB which can be installed with SQL Server Express 2016
             // https://www.microsoft.com/en-us/download/details.aspx?id=54284
             services.AddDbContext<CatalogContext>(c =>
-                c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
+                c.UseInMemoryDatabase("CatalogConnection"));
 
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+                options.UseSqlServer("IdentityConnection"));
 
             ConfigureServices(services);
         }
@@ -123,7 +123,7 @@ namespace Microsoft.eShopWeb.PublicApi
                 options.AddPolicy(name: CORS_POLICY,
                                   builder =>
                                   {
-                                      builder.WithOrigins(baseUrlConfig.WebBase.Replace("host.docker.internal", "localhost").TrimEnd('/'));
+                                      builder.WithOrigins(baseUrlConfig.WebBase.Split(";"));;
                                       builder.AllowAnyMethod();
                                       builder.AllowAnyHeader();
                                   });
