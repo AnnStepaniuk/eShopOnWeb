@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Linq;
@@ -19,14 +20,17 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
         private readonly IAsyncRepository<CatalogItem> _itemRepository;
         private readonly IUriComposer _uriComposer;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public ListPaged(IAsyncRepository<CatalogItem> itemRepository,
             IUriComposer uriComposer,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<ListPaged> logger)
         {
             _itemRepository = itemRepository;
             _uriComposer = uriComposer;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("api/catalog-items")]
@@ -51,12 +55,16 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
 
             var items = await _itemRepository.ListAsync(pagedSpec, cancellationToken);
 
+            _logger.LogInformation($"Number of Catalog Items: {items.Count}");
+
             response.CatalogItems.AddRange(items.Select(_mapper.Map<CatalogItemDto>));
             foreach (CatalogItemDto item in response.CatalogItems)
             {
                 item.PictureUri = _uriComposer.ComposePicUri(item.PictureUri);
             }
             response.PageCount = int.Parse(Math.Ceiling((decimal)totalItems / request.PageSize).ToString());
+            
+            //throw new Exception("Cannot move further");
 
             return Ok(response);
         }
