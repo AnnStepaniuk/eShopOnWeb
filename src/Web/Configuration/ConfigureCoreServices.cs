@@ -17,6 +17,7 @@ namespace Microsoft.eShopWeb.Web.Configuration
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddHttpClient<IOrderItemsReserverProxy, OrderItemsReserverProxy>();
+            services.AddHttpClient<IDeliveryOrderProcessorProxy, DeliveryOrderProcessorProxy>();
             services.AddSingleton<IUriComposer>(new UriComposer(configuration.Get<CatalogSettings>()));
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
             services.AddTransient<IEmailSender, EmailSender>();
