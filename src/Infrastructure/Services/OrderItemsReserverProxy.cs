@@ -1,8 +1,6 @@
-﻿using Microsoft.eShopWeb.ApplicationCore.Interfaces;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.ServiceBus;
+using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Newtonsoft.Json;
-using System;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,27 +8,22 @@ namespace Microsoft.eShopWeb.Infrastructure.Services
 {
     public class OrderItemsReserverProxy : IOrderItemsReserverProxy
     {
-        private readonly HttpClient _httpClient;
-        private readonly Lazy<string> _orderItemsReserverUrl;
+        const string ServiceBusConnectionString = "Endpoint=sb://eshop-web.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Izz/ETkmaNwN7MYIkFLTUfxZpKovj3j5al2ro3OyEfE=";
+        const string QueueName = "orderitemsqueue";
+        static IQueueClient queueClient;
 
-        public OrderItemsReserverProxy(HttpClient httpClient, IConfiguration configuration)
+        public OrderItemsReserverProxy()
         {
-            _httpClient = httpClient;
-            _orderItemsReserverUrl = new Lazy<string>(() => configuration["ORDER_ITEMS_RESERVER_URL"]);
         }
 
         public async Task SendAsync<T>(T request)
         {
-            var message = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(_orderItemsReserverUrl.Value),
-                Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
-            };
-
-            var result = await _httpClient.SendAsync(message);
-
-            result.EnsureSuccessStatusCode();
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            
+            var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request)));
+            
+            await queueClient.SendAsync(message);
+            await queueClient.CloseAsync();
         }
     }
 }
