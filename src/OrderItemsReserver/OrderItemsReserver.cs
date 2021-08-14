@@ -30,7 +30,7 @@ namespace OrderItemsReserver
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 blobClient.DefaultRequestOptions = new BlobRequestOptions
                 {
-                    RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(5), 3),
+                    RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(5), 3)
                 };
                 var container = blobClient.GetContainerReference("reserved-order-items");
                 var blockBlob = container.GetBlockBlobReference($"{DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}.json");
