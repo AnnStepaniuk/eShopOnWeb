@@ -1,4 +1,3 @@
-using DeliveryOrderProcessor.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
@@ -22,15 +21,22 @@ namespace DeliveryOrderProcessor
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             var request = await new StreamReader(req.Body).ReadToEndAsync();
-            var container = await CreateDatabaseAndContainerIfNotExists(request);
-            await container.CreateItemAsync(JsonConvert.DeserializeObject(request));
+            await SendOrderDataToCosmosDb(request);
 
             return new OkObjectResult("Success");
         }
 
-        private static async Task<Container> CreateDatabaseAndContainerIfNotExists(string request)
+        private static async Task SendOrderDataToCosmosDb(string request)
         {
             using var client = new CosmosClient(Environment.GetEnvironmentVariable("COSMOSDB_ACCOUNT_ENDPOINT"), Environment.GetEnvironmentVariable("COSMOSDB_PRIMERYKEY"));
+
+            var container = await CreateDatabaseAndContainerIfNotExists(client);
+
+            await container.CreateItemAsync(JsonConvert.DeserializeObject(request));
+        }
+
+        private static async Task<Container> CreateDatabaseAndContainerIfNotExists(CosmosClient client)
+        {
             var databaseResponse = await client.CreateDatabaseIfNotExistsAsync("EshopDB");
             var targetDatabase = databaseResponse.Database;
             var indexingPolicy = new IndexingPolicy
