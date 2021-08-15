@@ -66,11 +66,15 @@ namespace Microsoft.eShopWeb.PublicApi
             // Requires LocalDB which can be installed with SQL Server Express 2016
             // https://www.microsoft.com/en-us/download/details.aspx?id=54284
             services.AddDbContext<CatalogContext>(c =>
-                c.UseInMemoryDatabase("CatalogConnection"));
+                c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
+            //services.AddDbContext<CatalogContext>(c =>
+            //    c.UseInMemoryDatabase("Catalog"));
 
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer("IdentityConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseInMemoryDatabase("Identity"));
 
             ConfigureServices(services);
         }
@@ -100,6 +104,7 @@ namespace Microsoft.eShopWeb.PublicApi
 
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
+            services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
             services.AddScoped<IFileSystem, WebFileSystem>(x => new WebFileSystem($"{baseUrlConfig.WebBase}File"));
 
             services.AddMemoryCache();

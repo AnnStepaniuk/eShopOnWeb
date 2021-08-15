@@ -19,13 +19,13 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints
     {
         private readonly IAsyncRepository<CatalogBrand> _catalogBrandRepository;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<List> _logger;
+        private readonly BaseUrlConfiguration _configuration;
+        private readonly IAppLogger<List> _logger;
 
         public List(IAsyncRepository<CatalogBrand> catalogBrandRepository,
             IMapper mapper,
-            IConfiguration configuration,
-            ILogger<List> logger)
+            BaseUrlConfiguration configuration,
+            IAppLogger<List> logger)
         {
             _catalogBrandRepository = catalogBrandRepository;
             _mapper = mapper;
@@ -42,7 +42,8 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints
         ]
         public override async Task<ActionResult<ListCatalogBrandsResponse>> HandleAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("AAAAAAAAAAAA " + _configuration.GetValue<BaseUrlConfiguration>("baseUrls").WebBase);
+            _logger.LogInformation("AAAAAAAAAAAA");
+            _logger.LogInformation("BaseUrlConfiguration " + _configuration.WebBase);
             var response = new ListCatalogBrandsResponse();
 
             var items = await _catalogBrandRepository.ListAllAsync(cancellationToken);

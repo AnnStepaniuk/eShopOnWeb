@@ -55,8 +55,29 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             var order = new Order(basket.BuyerId, shippingAddress, items);
 
             await _orderRepository.AddAsync(order);
-            await _orderItemsReserverProxy.SendAsync(order.OrderItems.Select(e => new OrderItemForReserve(e.ItemOrdered.CatalogItemId, e.Units)).ToList());
-            //await _deliveryOrderProcessorProxy.SendAsync(order);
+            await _orderItemsReserverProxy.SendAsync(
+                order.Id,
+                order.OrderItems.Select(e => new { ItemId = e.ItemOrdered.CatalogItemId, Quantity = e.Units }).ToList());
+            await SendOrderDataToDeliveryOrderProcessor(order);
         }
+
+        private async Task SendOrderDataToDeliveryOrderProcessor(Order order) =>
+            await _deliveryOrderProcessorProxy.SendAsync(new
+            {
+                id = order.Id.ToString(),
+                ShippingAddress = order.ShipToAddress,
+                OrderItems = order
+                    .OrderItems
+                    .Select(p => new
+                    {
+                        ItemId = p.ItemOrdered.CatalogItemId,
+                        Name = p.ItemOrdered.ProductName,
+                        PerItemPrice = p.UnitPrice,
+                        ItemsCount = p.Units
+                    })
+                    .ToList(),
+                FinalPrice = order.Total(),
+                OrderDate = order.OrderDate
+            });
     }
 }

@@ -61,16 +61,16 @@ namespace Microsoft.eShopWeb.Web
         private void ConfigureInMemoryDatabases(IServiceCollection services)
         {
             // use in-memory database
-            //services.AddDbContext<CatalogContext>(c =>
-            //    c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
             services.AddDbContext<CatalogContext>(c =>
-                c.UseInMemoryDatabase("Catalog"));
+                c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
+            //services.AddDbContext<CatalogContext>(c =>
+            //    c.UseInMemoryDatabase("Catalog"));
 
             // Add Identity DbContext
-            //services.AddDbContext<AppIdentityDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
+                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseInMemoryDatabase("Identity"));
 
             ConfigureServices(services);
         }
@@ -80,16 +80,16 @@ namespace Microsoft.eShopWeb.Web
             // use real database
             // Requires LocalDB which can be installed with SQL Server Express 2016
             // https://www.microsoft.com/en-us/download/details.aspx?id=54284
-            //services.AddDbContext<CatalogContext>(c =>
-            //    c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
             services.AddDbContext<CatalogContext>(c =>
-                c.UseInMemoryDatabase("Catalog"));
+                c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection")));
+            //services.AddDbContext<CatalogContext>(c =>
+            //    c.UseInMemoryDatabase("Catalog"));
 
             // Add Identity DbContext
-            //services.AddDbContext<AppIdentityDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
+                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            //services.AddDbContext<AppIdentityDbContext>(options =>
+            //    options.UseInMemoryDatabase("Identity"));
 
             ConfigureServices(services);
         }
